@@ -27,4 +27,11 @@ module.exports.login_post = async (req, res) => {
   }
 };
 
-module.exports.allUsers_get = async (req, res) => {};
+module.exports.allUsers_get = async (req, res) => {
+  try {
+    const users = await User.find({});
+    res.send({ data: users });
+  } catch (err) {
+    res.status(500).send('Error while getting all users');
+  }
+};

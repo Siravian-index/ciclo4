@@ -15,7 +15,9 @@ const userSchema = new mongoose.Schema({
   },
   rol: {
     type: String,
-    require: true,
+  },
+  status: {
+    type: String,
   },
   email: {
     type: String,
