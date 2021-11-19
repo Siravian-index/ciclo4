@@ -1,5 +1,6 @@
 const User = require('../models/Users');
 const bcrypt = require('bcrypt');
+const { saltIt } = require('../utils/saltAndPepper');
 
 module.exports.signup_post = async (req, res) => {
   const { firstName, lastName, email, password, rol } = req.body;
@@ -9,7 +10,7 @@ module.exports.signup_post = async (req, res) => {
       firstName,
       lastName,
       email,
-      password,
+      password: await saltIt(password),
       rol,
       status,
     });
@@ -46,35 +47,23 @@ module.exports.allUsers_get = async (req, res) => {
 // change this to save
 module.exports.updateUser_put = async (req, res) => {
   try {
-    const { _id, firstName, lastName, rol, status, email, password } = req.body;
+    const { _id, password } = req.body;
     const user = await User.findById(_id);
     if (!user) {
       throw new Error('User not found');
     }
-    let updatedUser = null;
-    const auth = await bcrypt.compare(password, user.password);
-    if (auth) {
-      // password did not change
-      updatedUser = await User.findOneAndUpdate({ _id }, req.body, {
-        returnOriginal: false,
-      });
-      res.status(200).json({ data: updatedUser });
+
+    if (password) {
+      req.body.password = await saltIt(password);
     } else {
-      // password did change salt it
+      delete req.body.password;
     }
-    //----------
-    // const user = await this.findOne({ email });
-    // if (user) {
-    //   const auth = await bcrypt.compare(password, user.password);
-    //   if (auth) {
-    //     return user;
-    //   }
-    //----------
-    // let updatedUser = await User.findOneAndUpdate({ _id }, req.body, {
-    //   returnOriginal: false,
-    // });
-    // res.send({ data: updatedUser });
+    const updatedUser = await User.findOneAndUpdate({ _id }, req.body, {
+      returnOriginal: false,
+    });
+    res.status(200).json({ data: updatedUser });
   } catch (err) {
+    console.log(err);
     res.status(400).send('Error while updating user');
   }
 };
