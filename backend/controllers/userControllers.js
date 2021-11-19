@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 
 module.exports.signup_post = async (req, res) => {
   const { firstName, lastName, email, password, rol } = req.body;
+  const status = 'pending';
   try {
     const user = await User.create({
       firstName,
@@ -10,6 +11,7 @@ module.exports.signup_post = async (req, res) => {
       email,
       password,
       rol,
+      status,
     });
     // change to user._id after tests
     res.status(201).json({ data: user });
@@ -22,12 +24,11 @@ module.exports.login_post = async (req, res) => {
 
   try {
     const user = await User.login(email, password);
-    // return something useful to the frontend
     const data = {
-      user: user._id,
-      permission: true,
+      user,
+      isLogin: true,
     };
-    res.status(200).json({ data: data });
+    res.status(200).json({ data });
   } catch (err) {
     res.status(400).send('Error while logging');
   }
@@ -38,34 +39,42 @@ module.exports.allUsers_get = async (req, res) => {
     const users = await User.find({});
     res.send({ data: users });
   } catch (err) {
-    console.log(err);
     res.status(500).send('Error while getting all users');
   }
 };
 
-/**
- * Dado que ingresé al sistema de gestión de proyectos
-
-Cuando necesite actualizar la información personal
-
-Entonces podré ingresar los datos que deseo actualizar
- */
-
+// change this to save
 module.exports.updateUser_put = async (req, res) => {
   try {
-    const { _id } = req.body;
+    const { _id, firstName, lastName, rol, status, email, password } = req.body;
     const user = await User.findById(_id);
     if (!user) {
       throw new Error('User not found');
     }
-    let updatedUser = await User.findOneAndUpdate({ _id }, req.body, {
-      returnOriginal: false,
-    });
-    const salt = await bcrypt.genSalt();
-    updatedUser.password = await bcrypt.hash(updatedUser.password, salt);
-    res.send({ data: updatedUser });
+    let updatedUser = null;
+    const auth = await bcrypt.compare(password, user.password);
+    if (auth) {
+      // password did not change
+      updatedUser = await User.findOneAndUpdate({ _id }, req.body, {
+        returnOriginal: false,
+      });
+      res.status(200).json({ data: updatedUser });
+    } else {
+      // password did change salt it
+    }
+    //----------
+    // const user = await this.findOne({ email });
+    // if (user) {
+    //   const auth = await bcrypt.compare(password, user.password);
+    //   if (auth) {
+    //     return user;
+    //   }
+    //----------
+    // let updatedUser = await User.findOneAndUpdate({ _id }, req.body, {
+    //   returnOriginal: false,
+    // });
+    // res.send({ data: updatedUser });
   } catch (err) {
-    console.log(err);
     res.status(400).send('Error while updating user');
   }
 };

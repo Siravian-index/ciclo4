@@ -6,18 +6,18 @@ const userSchema = new mongoose.Schema({
   firstName: {
     type: String,
     required: true,
-    lowercase: true,
   },
   lastName: {
     type: String,
     required: true,
-    lowercase: true,
   },
   rol: {
     type: String,
+    required: true,
   },
   status: {
     type: String,
+    required: true,
   },
   email: {
     type: String,
@@ -32,11 +32,11 @@ const userSchema = new mongoose.Schema({
   },
 });
 
-userSchema.pre('save', async function (next) {
-  const salt = await bcrypt.genSalt();
-  this.password = await bcrypt.hash(this.password, salt);
-  next();
-});
+// userSchema.pre('save', async function (next) {
+//   const salt = await bcrypt.genSalt();
+//   this.password = await bcrypt.hash(this.password, salt);
+//   next();
+// });
 
 // static method to login user
 userSchema.statics.login = async function (email, password) {
