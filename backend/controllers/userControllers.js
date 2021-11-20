@@ -1,5 +1,4 @@
 const User = require('../models/Users');
-const bcrypt = require('bcrypt');
 const { saltIt } = require('../utils/saltAndPepper');
 
 module.exports.signup_post = async (req, res) => {

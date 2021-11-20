@@ -32,7 +32,7 @@ const userSchema = new mongoose.Schema({
   },
 });
 
-// delete pass
+// delete password
 userSchema.options.toJSON = {
   transform: function (doc, ret, options) {
     delete ret.password;

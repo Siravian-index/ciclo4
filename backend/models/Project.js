@@ -16,6 +16,9 @@ const projectSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  participants: {
+    type: [String],
+  },
   status: {
     type: String,
     required: true,
@@ -29,3 +32,7 @@ const projectSchema = new mongoose.Schema({
     required: true,
   },
 });
+
+const Project = mongoose.model('project', projectSchema);
+
+module.exports = Project;

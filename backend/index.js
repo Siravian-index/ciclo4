@@ -7,6 +7,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 // local imports
 const userRoutes = require('./routes/userRoutes');
+const projectRoutes = require('./routes/projectRoutes');
 
 // app
 const app = express();
@@ -43,3 +44,4 @@ mongoose
 // routes
 app.get('/', (req, res) => res.send('set up'));
 app.use(userRoutes);
+app.use(projectRoutes);
